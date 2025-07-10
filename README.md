@@ -25,6 +25,18 @@ A modular real-time object detection pipeline for Linux boxes, Raspberry Pi, or 
 - **Subscriber:** ZeroMQ subscriber (implements `ISubscriber`)
   - Throttling and deduplication configurable
 
+## Multi-Camera Grid View
+
+Now supports **multiple camera feeds** with a **dynamic grid view**:
+
+- Supports any mix of webcams and RTSP streams  
+- Automatically resizes all feeds to the same dimensions  
+- Arranges feeds in a neat grid: 1x1, 2x2, 3x3, 4x4... auto-adjusts as you add cameras  
+- Each detection includes a camera ID so you know *which feed saw what*  
+- Publishes detection events over ZeroMQ for your LLM or dashboard to consume
+
+
+---
 
 ```mermaid
 flowchart TD
@@ -71,10 +83,34 @@ This project includes a modular ZeroMQ pub/sub interface:
 
 ```
 
+## Example config
+```yaml
+cameras:
+  - id: "garage_webcam"
+    type: webcam
+    index: 0
+
+  - id: "driveway_rtsp"
+    type: rtsp
+    url: "rtsps://192.168.10.176:7441/..."
+```
+
+## Example event JSON
+Each detection event includes:
+```json
+{
+  "timestamp": 1720518700.123,
+  "camera_id": "driveway_rtsp",
+  "labels": ["person", "car"],
+  "boxes": [...]
+}
+```
+
+
 ## 🗺️ Roadmap
 See [IDEAS.md](IDEAS.md) for current and future plans.
 
 
 ---
 
-Built with ❤️ by Mrunmoy — keep watching!
+Built with ❤️ - keep watching!
