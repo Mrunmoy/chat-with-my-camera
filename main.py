@@ -9,15 +9,20 @@ This script:
 """
 
 from camera.webcam import Webcam
+from camera.rtsp import RTSPCamera
+
 from detection.yolov8 import YOLODetector
 from publisher.zeromq_pub import ZeroMQPublisher
+
 import cv2
 import time
 import base64
 
 def main():
     # Initialize camera source (webcam index 0 by default)
-    cam = Webcam()
+    # cam = Webcam()
+    rtsp_url = "rtsps://192.168.10.176:7441/pam607F6TjwKqzzS?enableSrtp"
+    cam = RTSPCamera(rtsp_url)
 
     # Initialize YOLO detector (uses yolov8n.pt by default)
     detector = YOLODetector()
