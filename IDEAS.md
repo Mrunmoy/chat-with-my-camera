@@ -3,9 +3,9 @@
 ### Whats working Now
 - [x] Local webcam source → tested!
 - [x] YOLOv8 detection loop → tested!
+- [x] Add ZeroMQ publisher to send detection results.
 
 ### Next Steps
-- Add ZeroMQ publisher to send detection results.
 - Test RTSP camera input.
 - Add config file (YAML or JSON) for camera source & backend.
 - Log detections to file or DB (for LLM queries later).
