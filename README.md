@@ -1,27 +1,12 @@
 # 📸 chat-with-my-camera
 ![Project Status](https://img.shields.io/badge/status-under--construction-yellow) 
 
-[![main](https://img.shields.io/badge/branch-main-blue)](https://github.com/Mrunmoy/chat-with-my-camera/tree/main)
-[![go-backend](https://img.shields.io/badge/branch-go--backend-brightgreen)](https://github.com/Mrunmoy/chat-with-my-camera/tree/dev/go-backend)
-
 ![Under Construction Cat](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)
-
 
 🚧 **This project is under progress!** 🚧
 
 
 A modular real-time object detection pipeline for Linux boxes, Raspberry Pi, or Jetson — built to run YOLOv8 and talk to you about what it sees. 
-
-## Branches
-
-- [**main**](https://github.com/Mrunmoy/chat-with-my-camera/tree/main)  
-   - Stable YOLO detection, ZeroMQ pub/sub, JSONL logger.
-- [**go-backend**](https://github.com/Mrunmoy/chat-with-my-camera/tree/dev/go-backend) 
-  - Experimental backend service in Go
-  - SQLite storage + retention
-  - Local API for timeline queries
-  - MQTT or webhook publishing for Home Assistant.
-
 
 ## Features
 - Modular camera source (webcam now, RTSP next!)
@@ -54,10 +39,12 @@ Now supports **multiple camera feeds** with a **dynamic grid view**:
 
 ```mermaid
 flowchart TD
-    A["📷 Webcam Source<br/>(OpenCV)"] --> B["🦁 YOLOv8 Detector<br/>(Ultralytics)"]
-    B --> C["📡 ZeroMQPublisher<br/>(IPublisher)"]
-    C -->|"ZeroMQ PUB/SUB"| D["🔔 ZeroMQSubscriber<br/>(ISubscriber)"]
-    D --> E["🗒️ Print Labels & Boxes<br/>(Throttled + Deduped)"]
+    A["📷 Cameras (Webcam / RTSP)<br/>(OpenCV)"] --> B["🦁 YOLOv8 Detector<br/>(Ultralytics, Python)"]
+    B --> C["📡 ZeroMQPublisher<br/>(Python IPublisher)"]
+    C -->|"ZeroMQ PUB/SUB"| D["⚙️ Go Backend Service<br/>• DB Logger (SQLite + Retention)<br/>• Timeline API<br/>• Home Assistant Push (MQTT/Webhook)"]
+    D --> E["🗒️ SQLite DB<br/>• Metadata<br/>• Snapshot Paths"]
+    D --> F["🏠 Home Assistant"]
+    D --> G["🤖 LLM / Timeline Dashboard"]
 ```
 
 ---
