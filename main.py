@@ -13,37 +13,39 @@ from camera.rtsp import RTSPCamera
 
 from detection.yolov8 import YOLODetector
 from publisher.zeromq_pub import ZeroMQPublisher
+from utils.config_loader import load_config
 
 import cv2
 import time
 import base64
 
 def main():
-    # Initialize camera source (webcam index 0 by default)
-    # cam = Webcam()
-    rtsp_url = "rtsps://192.168.10.176:7441/pam607F6TjwKqzzS?enableSrtp"
-    cam = RTSPCamera(rtsp_url)
+    config = load_config(filename="config/config.yaml")
+
+    # Choose camera source based on config
+    if config["camera"]["type"] == "webcam":
+        cam = Webcam(index=config["camera"]["index"])
+    elif config["camera"]["type"] == "rtsp":
+        cam = RTSPCamera(url=config["camera"]["url"])
+    else:
+        raise ValueError(f"Unknown camera type: {config['camera']['type']}")
 
     # Initialize YOLO detector (uses yolov8n.pt by default)
     detector = YOLODetector()
 
     # Initialize ZeroMQ publisher on port 5555
-    publisher = ZeroMQPublisher(port=5555)
+    publisher = ZeroMQPublisher(port=config["publisher"]["port"])
 
-    print("[Main] Starting detection loop. Press 'q' to quit.")
+    print("[Main] Running with config:", config)
 
     while True:
-        # Capture a single frame
         frame = cam.get_frame()
-
-        # Run detection on the frame
         results = detector.process(frame)
 
-        for result in results:
-            # Extract bounding boxes
-            boxes = result.boxes.xyxy.cpu().numpy().tolist() if result.boxes else []
+        annotated_frame = frame.copy()
 
-            # Extract labels
+        for result in results:
+            boxes = result.boxes.xyxy.cpu().numpy().tolist() if result.boxes else []
             labels = [result.names[i] for i in result.boxes.cls.cpu().numpy().astype(int)] if result.boxes else []
 
             # Encode frame with drawn boxes
@@ -79,3 +81,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
