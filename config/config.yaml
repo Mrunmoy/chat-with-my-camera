@@ -1,7 +1,11 @@
-camera:
-  type: rtsp       # 'webcam' or 'rtsp'
-  url: "rtsps://192.168.10.176:7441/pam607F6TjwKqzzS?enableSrtp"
-  index: 0         # Only used if type == 'webcam'
+cameras:
+  - id: garage_webcam
+    type: webcam  # 'webcam' or 'rtsp'
+    index: 0
+
+  - id: lounge_rtsp
+    type: rtsp
+    url: "rtsps://192.168.10.176:7441/pam607F6TjwKqzzS?enableSrtp"
 
 publisher:
   port: 5555
