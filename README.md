@@ -1,6 +1,8 @@
 # 📸 chat-with-my-camera
 ![Project Status](https://img.shields.io/badge/status-under--construction-yellow) 
 
+[![main](https://img.shields.io/badge/branch-main-blue)](https://github.com/Mrunmoy/chat-with-my-camera/tree/main)
+[![go-backend](https://img.shields.io/badge/branch-go--backend-brightgreen)](https://github.com/Mrunmoy/chat-with-my-camera/tree/dev/go-backend)
 
 ![Under Construction Cat](https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif)
 
@@ -10,6 +12,17 @@
 
 A modular real-time object detection pipeline for Linux boxes, Raspberry Pi, or Jetson — built to run YOLOv8 and talk to you about what it sees. 
 
+## Branches
+
+- [**main**](https://github.com/Mrunmoy/chat-with-my-camera/tree/main)  
+   - Stable YOLO detection, ZeroMQ pub/sub, JSONL logger.
+- [**go-backend**](https://github.com/Mrunmoy/chat-with-my-camera/tree/dev/go-backend) 
+  - Experimental backend service in Go
+  - SQLite storage + retention
+  - Local API for timeline queries
+  - MQTT or webhook publishing for Home Assistant.
+
+
 ## Features
 - Modular camera source (webcam now, RTSP next!)
 - YOLOv8 inference with PyTorch/Ultralytics
@@ -17,7 +30,8 @@ A modular real-time object detection pipeline for Linux boxes, Raspberry Pi, or 
 - ZeroMQ publisher planned for detection events
 - Future: integrate local LLM (Ollama) to chat with your detection logs
 
-### Current Pipeline
+
+## Current Pipeline
 
 - **Camera Source:** Local webcam
 - **Detector:** YOLOv8 (via `ultralytics` Python package)
