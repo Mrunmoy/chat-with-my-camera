@@ -49,6 +49,51 @@ flowchart TD
 
 ---
 
+## Directory Structure
+```
+chat-with-my-camera/                # Root of your project
+├── config/                         #  Configuration files (env vars, secrets, YAMLs)
+│
+├── backend/                        # Go backend service
+│   ├── main.go                     # Main entry point: starts ZeroMQ subscriber & HTTP REST server
+│   ├── db.go                       #  SQLite DB connection, schema migration, CRUD
+│   ├── retention.go                # Data retention: rolling window logic (e.g. delete older than 5 days)
+│   ├── publisher.go                # Publishes events to MQTT broker or Home Assistant webhook
+│   ├── handlers.go                 # REST API endpoints: /timeline, /health, etc.
+│   ├── go.mod                      # Go module declaration (module name, dependencies)
+│   ├── go.sum                      # Go dependency checksums (auto-generated)
+│   ├── config.yaml                 # Backend config: DB path, server port, retention window
+│
+├── camera/                         # Python camera modules (OpenCV capture, etc.)
+│
+├── detection/                      # YOLOv8 Python detection logic
+│
+├── publisher/                      # ZeroMQ publisher/subscriber interfaces
+│
+├── utils/                          # Shared Python utility functions
+│
+├── README.md                       # Project overview & updated backend flowchart
+│
+├── requirements.txt                # Python dependencies (pinned versions)
+│
+├── IDEAS.md                        # Brain dump: future features, notes, todos
+│
+├── LICENSE                         # Project license
+│
+├── main.py                         # Python entry point: camera + detection + ZeroMQ publisher
+│
+├── publisher                       # Appears duplicate? Maybe leftover — check this
+│
+├── utils                           # Same: maybe redundant with `utils/` dir? Clean up if needed
+│
+├── venv/                           # Python virtual environment directory
+│
+├── yolov8n.pt                      # YOLOv8 nano model weights file
+│
+└── zmq_subscriber_example.py       # Example: ZeroMQ subscriber in Python for testing
+
+```
+
 ### Quick Start
 ```bash
 # Create and activate a venv
