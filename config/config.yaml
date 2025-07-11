@@ -1,3 +1,5 @@
+retention_days: 5
+
 cameras:
   - id: garage_webcam
     type: webcam  # 'webcam' or 'rtsp'
@@ -11,5 +13,5 @@ publisher:
   port: 5555
 
 subscriber:
-  throttle_n: 0   # 0 = no throttle
+  throttle_n: 10   # 0 = no throttle
   deduplicate: true
