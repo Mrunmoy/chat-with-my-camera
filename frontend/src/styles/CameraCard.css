@@ -1,0 +1,42 @@
+/* === Camera Card Container === */
+.camera-card {
+  /* Flex layout to stack block + label vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Card appearance */
+  border: 2px solid #444;
+  border-radius: 8px;
+  background-color: #222; /* Card background */
+  color: #fff; /* Text color */
+
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+  /* Smooth hover lift effect */
+  transition: transform 0.2s ease;
+}
+
+/* Lift up on hover */
+.camera-card:hover {
+  transform: translateY(-4px);
+}
+
+/* === Colorful Block === */
+.camera-card__block {
+  /* This gets its background-color from inline style */
+  width: 100%;
+  padding: 40px 0;
+
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* === Label below the block === */
+.camera-card__label {
+  padding: 10px 0;
+  text-align: center;
+  font-size: 1rem;
+}

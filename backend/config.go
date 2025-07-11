@@ -14,10 +14,18 @@ type SubscriberConfig struct {
 	Deduplicate bool `yaml:"deduplicate"`
 }
 
+// CameraConfig represents each camera entry from your YAML config.
+type CameraConfig struct {
+	ID   string `yaml:"id"`
+	Type string `yaml:"type"`
+	// You can add more fields: URL, index, etc.
+}
+
 // Config holds all global settings for the backend.
 type Config struct {
 	Subscriber    SubscriberConfig `yaml:"subscriber"`
 	RetentionDays int              `yaml:"retention_days"`
+	Cameras       []CameraConfig   `yaml:"cameras"`
 }
 
 // loadConfig reads and parses the YAML config file and RETURNS it.
