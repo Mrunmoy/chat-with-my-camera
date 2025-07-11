@@ -1,0 +1,39 @@
+/* === History Box Container === */
+.history-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Fill the parent height (your .history pane) */
+  overflow: hidden;
+}
+
+/* === Filter Bar (Start/End pickers) === */
+.history-filters {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #444; /* Subtle separator */
+}
+
+.history-filters label {
+  display: block;
+  margin-bottom: 4px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* Make date pickers stand out */
+.history-filters .react-datepicker-wrapper {
+  display: block;
+}
+
+/* === Timeline === */
+.history-timeline {
+  flex: 1;             /* Take remaining vertical space */
+  overflow-y: auto;    /* Make timeline scrollable */
+  padding: 10px 0;
+}
+
+.history-timeline .chrono-card {
+  background-color: #222; /* Override default light bg if needed */
+}

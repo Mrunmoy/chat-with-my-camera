@@ -1,8 +1,10 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import CameraPreview from './CameraPreview';
 import Split from 'react-split';
 import '../styles/CameraPage.css';
+
+import CameraPreview from './CameraPreview';
+import HistoryBox from './HistoryBox';
 
 /**
  * CameraPage
@@ -45,7 +47,7 @@ const CameraPage = () => {
             <CameraPreview cameraId={cameraId} />
           </div>
           <div className="history">
-            <div>History for {cameraId}</div>
+            <HistoryBox cameraId={cameraId} />
           </div>
         </div>
 

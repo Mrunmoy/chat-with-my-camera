@@ -25,6 +25,9 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 	startTimeStr := r.URL.Query().Get("start_time")
 	endTimeStr := r.URL.Query().Get("end_time")
 
+
+	log.Printf("[TimelineHandler] camera_id: %s, label: %s, start_time: %s, end_time: %s\n", cameraID, label, startTimeStr, endTimeStr)
+
 	// === Build WHERE conditions and arguments ===
 	var conditions []string
 	var args []interface{}
@@ -65,6 +68,9 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
     // So we don’t dump thousands of rows on a single query. Can add ?limit later.
 	query += " ORDER BY timestamp DESC LIMIT 100" // Limit to 100 results for now
 
+
+	log.Printf("Timeline query: %s\n", query)
+
 	// === Execute query ===
 	rows, err := app.DB.Query(query, args...)
 	if err != nil {
@@ -76,6 +82,8 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 
 	// === Collect rows ===
 	var results []map[string]interface{}
+
+	log.Printf("results: %v\n", results)
 	for rows.Next() {
 		var ts float64
 		var cid, labels, boxes, snapshotFile string
