@@ -38,5 +38,7 @@ func main() {
 
 	http.HandleFunc("/timeline", handleTimeline)
 
+	http.Handle("/snapshots/", http.StripPrefix("/snapshots/", http.FileServer(http.Dir("./snapshots"))))
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
