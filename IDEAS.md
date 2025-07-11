@@ -14,14 +14,14 @@
 - [x] Timeline API → `/timeline` with filters & query params.
 - [x] Static snapshot server → `/snapshots/` serving direct images.
 - [x] Timeline JSON now includes `snapshot_url` for front-end or HA.
-
+- [x] **Backend refactored to use `App` struct**
+  - Clean separation of DB + config.
+  - All handlers and jobs as `App` methods.
+  - Zero globals → thread-safe, portable, testable.
+- [x] ✅ Retention job: deletes old DB rows AND snapshot files → fully tested!
 ---
 
 ## Up Next
-
-### 🟢 Retention / Pruning
-- Periodically remove old events & snapshots (keep DB + disk tidy).
-- Configurable retention: days or size-based.
 
 ### 🟢 Mini HTML / React Timeline UI
 - Small test dashboard to render timeline grid with thumbnails.
@@ -42,6 +42,7 @@ Sandbox to learn:
 - Real-time computer vision + OpenCV
 - YOLOv8 edge detection
 - ZeroMQ pub/sub for decoupled pipelines
-- SQLite event store
+- SQLite event store with retention & disk cleanup
 - Fast Go backend for REST + static files
-- Multi-cam smart surveillance 🐱✨
+- Clean `App` struct pattern for microservice style
+- Multi-cam smart surveillance
