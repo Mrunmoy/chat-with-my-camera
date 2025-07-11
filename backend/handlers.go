@@ -13,7 +13,7 @@ import (
 
 // timelineHandler handles GET requests to /timeline
 // It queries the SQLite 'detections' table and returns matching events as JSON.
-func handleTimeline(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 	// === Parse query params ===
 	// Example: /timeline?camera_id=garage_webcam&label=person&start_time=...&end_time=...
 	cameraID := r.URL.Query().Get("camera_id")
@@ -62,7 +62,7 @@ func handleTimeline(w http.ResponseWriter, r *http.Request) {
 	query += " ORDER BY timestamp DESC LIMIT 100" // Limit to 100 results for now
 
 	// === Execute query ===
-	rows, err := db.Query(query, args...)
+	rows, err := app.DB.Query(query, args...)
 	if err != nil {
 		http.Error(w, "Query failed", http.StatusInternalServerError)
 		log.Printf("Timeline query error: %v", err)

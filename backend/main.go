@@ -20,24 +20,28 @@ Responsibilities:
 */
 
 func main() {
-	loadConfig() // read config.yaml at startup
+	config := loadConfig() // read config.yaml at startup
 
 	// Initialize SQLite DB
 	initDB()
 
+	app := &App {
+		DB:     db,
+		Config: config,
+	}
+
 	fmt.Println("[Go Backend] Starting ZeroMQ subscriber...")
-	go runSubscriber()
+	go app.runSubscriber()
 
 	fmt.Println("[Go Backend] Starting retention job...")
-	go runRetentionJob()
+	go app.runRetention()
 
 	fmt.Println("[Go Backend] Starting HTTP server on :8080...")
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})
 
-	http.HandleFunc("/timeline", handleTimeline)
-
+	http.HandleFunc("/timeline", app.handleTimeline)
 	http.Handle("/snapshots/", http.StripPrefix("/snapshots/", http.FileServer(http.Dir("./snapshots"))))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

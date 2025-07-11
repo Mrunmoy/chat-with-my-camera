@@ -17,7 +17,7 @@ var lastSaved = make(map[string]time.Time)
 
 
 // runSubscriber connects to the ZeroMQ PUB socket and writes each detection to SQLite.
-func runSubscriber() {
+func (app *App) runSubscriber() {
 	fmt.Println("[ZeroMQSubscriber] Connecting to tcp://localhost:5555...")
 
 	// Create ZeroMQ context and SUB socket
@@ -81,10 +81,10 @@ func runSubscriber() {
 		lastEvent, found := lastEvents[cameraID]
 		lastTime := lastSaved[cameraID]
 
-		if config.Subscriber.Deduplicate {
+		if app.Config.Subscriber.Deduplicate {
 			if labelsStr == lastEvent  && found {
-				if config.Subscriber.ThrottleN > 0 {
-					if time.Since(lastTime) < time.Duration(config.Subscriber.ThrottleN)*time.Second {
+				if app.Config.Subscriber.ThrottleN > 0 {
+					if time.Since(lastTime) < time.Duration(app.Config.Subscriber.ThrottleN)*time.Second {
 						continue // Skip duplicate within throttle window
 					}
 				} else {

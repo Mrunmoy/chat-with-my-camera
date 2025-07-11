@@ -1,66 +1,56 @@
 package main
 
 import (
-	// "database/sql"
-	"fmt"
 	"log"
 	"os"
 	"time"
 )
 
-// runRetentionJob deletes old rows + files beyond retention window.
-func runRetentionJob() {
-	retentionDays := 5 // Keep only last 5 days
-	ticker := time.NewTicker(1 * time.Hour) // How often to run
-	defer ticker.Stop()
-
+// runRetention runs in a loop: every hour it deletes events older than retention_days.
+func (app *App) runRetention() {
+	retentionDays := app.Config.RetentionDays
 	for {
-		select {
-		case <-ticker.C:
-			fmt.Println("[Retention] Running cleanup...")
-			now := float64(time.Now().Unix())
-			cutoff := now - (float64(retentionDays) * 86400) // 5 days in seconds
+		log.Printf("[Retention] Running... (keeping last %d days)", retentionDays)
 
-			rows, err := db.Query("SELECT id, snapshot_file FROM detections WHERE timestamp < ?", cutoff)
-			if err != nil {
-				log.Printf("Retention query failed: %v", err)
-				continue
-			}
+		// Calculate cutoff timestamp
+		cutoff := time.Now().AddDate(0, 0, -retentionDays).Unix()
 
-			var deleteIDs []int64
-			for rows.Next() {
-				var id int64
-				var snapshot string
-				if err := rows.Scan(&id, &snapshot); err != nil {
-					log.Printf("Retention row scan failed: %v", err)
-					continue
-				}
-
-				// Delete snapshot file if it exists
-				if snapshot != "" {
-					err := os.Remove(snapshot)
-					if err != nil && !os.IsNotExist(err) {
-						log.Printf("Failed to delete snapshot %s: %v", snapshot, err)
-					} else {
-						log.Printf("[Retention] Deleted snapshot: %s", snapshot)
-					}
-				}
-
-				deleteIDs = append(deleteIDs, id)
-			}
-			rows.Close()
-
-			// Delete rows by ID
-			for _, id := range deleteIDs {
-				_, err := db.Exec("DELETE FROM detections WHERE id = ?", id)
-				if err != nil {
-					log.Printf("Failed to delete row id=%d: %v", id, err)
-				} else {
-					log.Printf("[Retention] Deleted row id=%d", id)
-				}
-			}
-
-			fmt.Printf("[Retention] Done. Cutoff: %.0f, Deleted: %d rows.\n", cutoff, len(deleteIDs))
+		// Query old rows to get snapshot filenames
+		rows, err := app.DB.Query("SELECT snapshot_file FROM detections WHERE timestamp < ?", cutoff)
+		if err != nil {
+			log.Printf("Retention query failed: %v", err)
+			time.Sleep(time.Hour)
+			continue
 		}
+
+		var snapshotsToDelete []string
+		for rows.Next() {
+			var snap string
+			if err := rows.Scan(&snap); err == nil && snap != "" {
+				snapshotsToDelete = append(snapshotsToDelete, snap)
+			}
+		}
+		rows.Close()
+
+		// Delete snapshots from disk
+		for _, snap := range snapshotsToDelete {
+			if err := os.Remove(snap); err != nil {
+				log.Printf("Failed to remove snapshot: %s (%v)", snap, err)
+			} else {
+				log.Printf("Deleted snapshot: %s", snap)
+			}
+		}
+
+		// Delete old rows from DB
+		res, err := app.DB.Exec("DELETE FROM detections WHERE timestamp < ?", cutoff)
+		if err != nil {
+			log.Printf("Retention delete failed: %v", err)
+		} else {
+			affected, _ := res.RowsAffected()
+			log.Printf("[Retention] Deleted %d rows older than cutoff", affected)
+		}
+
+		// Sleep until next run
+		time.Sleep(time.Hour)
 	}
 }
