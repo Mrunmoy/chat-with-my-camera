@@ -148,11 +148,14 @@ func handleSnapshot(w http.ResponseWriter, r *http.Request) {
 
 // camerasHandler returns all cameras from your config.
 func (app *App) camerasHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	
 	cameras := []CameraInfo{}
 	for i, cam := range app.Config.Cameras {
 		cameras = append(cameras, CameraInfo{
 			ID:     cam.ID,
 			Number: i + 1, // 1-based serial number
+			Thumbnail: cam.Thumbnail, // from config.json
 		})
 	}
 

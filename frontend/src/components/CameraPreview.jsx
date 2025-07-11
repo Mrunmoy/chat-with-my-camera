@@ -22,7 +22,7 @@ const CameraPreview = ({ cameraId }) => {
    * - Updates local state with that camera object.
    */
   useEffect(() => {
-    fetch('/api/cameras')
+    fetch('http://localhost:8080/cameras')
       .then((res) => res.json())
       .then((data) => {
         // Find the camera that matches the given ID
@@ -41,7 +41,7 @@ const CameraPreview = ({ cameraId }) => {
   return (
     <div className="camera-preview">
       <img
-        src={`http://localhost:8080${camera.thumbnail}`}
+        src={`http://localhost:8080/static/${camera.thumbnail}`}
         alt={`Thumbnail for ${camera.id}`}
       />
     </div>

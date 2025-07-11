@@ -16,9 +16,11 @@ type SubscriberConfig struct {
 
 // CameraConfig represents each camera entry from your YAML config.
 type CameraConfig struct {
-	ID   string `yaml:"id"`
-	Type string `yaml:"type"`
-	// You can add more fields: URL, index, etc.
+	ID        string `yaml:"id"`
+	Type      string `yaml:"type"`
+	Index     int    `yaml:"index,omitempty"`
+	URL       string `yaml:"url,omitempty"`
+	Thumbnail string `yaml:"thumbnail"`
 }
 
 // Config holds all global settings for the backend.

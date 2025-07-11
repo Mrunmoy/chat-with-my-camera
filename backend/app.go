@@ -10,6 +10,7 @@ import (
 type CameraInfo struct {
 	ID     string `json:"id"`
 	Number int    `json:"number"`
+	Thumbnail string `json:"thumbnail"`
 }
 type App struct {
 	DB     *sql.DB

@@ -36,7 +36,7 @@ const HistoryBox = ({ cameraId }) => {
     const endEpoch = Math.floor(endDate.getTime() / 1000);
 
     // Build the correct URL with query params
-    const url = `/timeline?camera_id=${cameraId}&start_time=${startEpoch}&end_time=${endEpoch}`;
+    const url = `http://localhost:8080/timeline?camera_id=${cameraId}&start_time=${startEpoch}&end_time=${endEpoch}`;
 
     // Call your backend API
     fetch(url)
@@ -89,11 +89,12 @@ const HistoryBox = ({ cameraId }) => {
             items={events}
             mode="VERTICAL"      // Vertical timeline layout
             scrollable           // Allow vertical scroll
-            hideControls         // Hide left/right controls for vertical mode
+            slideShow
+            cardHeight={100}
             theme={{
               primary: '#6fba1c',
               secondary: '#1e1e1e',
-              cardBgColor: '#222'
+              cardBgColor: '#222222'
             }}
           />
         ) : (
