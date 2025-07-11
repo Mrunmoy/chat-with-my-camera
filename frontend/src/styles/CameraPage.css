@@ -1,0 +1,39 @@
+/* === Camera Page Layout === */
+.camera-layout {
+  display: flex;
+  flex-direction: column; /* Stacks main-content and chat vertically */
+  height: 100vh;          /* Full viewport height */
+}
+
+/* === Main area: preview and history side by side === */
+.main-content {
+  display: flex;   /* Side-by-side row layout */
+  flex: 1;         /* Takes remaining vertical space above chat */
+  overflow: hidden;
+  flex-wrap: nowrap; /* Never wrap — stay side by side */
+}
+
+/* Preview pane: latest camera feed/photo */
+.main-content .preview {
+  flex: 2; /* Bigger than history pane */
+  background-color: #111;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* History pane: event/detection list */
+.main-content .history {
+  flex: 1;
+  background-color: #222;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* === Bottom chat box === */
+.chat {
+  flex-shrink: 0;
+  height: 400px;
+  background-color: #333;
+  padding: 20px;
+  overflow: auto;
+}

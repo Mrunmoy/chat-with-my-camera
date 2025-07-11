@@ -80,6 +80,20 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* === Split gutter for vertical split === */
+.gutter {
+  background-color: #444;     /* Visible bar */
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;         /* 👈 Makes the mouse show as resize icon immediately */
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;         /* If you ever add horizontal splits */
+}
+
+
 /* === Remove Light Mode === */
 /* This app is dark mode only, so remove the light override! */
 /*

@@ -1,5 +1,6 @@
 import '../styles/CameraCard.css';
 import COLORS from '../constants/colours';
+import { Link } from 'react-router-dom';
 
 // === CameraCard Component ===
 // Displays a colored block with camera name and a label below.
@@ -11,17 +12,14 @@ function CameraCard({ name, label, color }) {
   };
 
   return (
-    <div className="camera-card">
-      {/* === Colorful Block === */}
+    <Link to={`/camera/${name}`} className="camera-card">
       <div className="camera-card__block" style={blockStyle}>
         {name}
       </div>
-
-      {/* === Label Text === */}
       <div className="camera-card__label">
         {label}
       </div>
-    </div>
+    </Link>
   );
 }
 
