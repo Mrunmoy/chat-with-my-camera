@@ -5,6 +5,7 @@ import '../styles/CameraPage.css';
 
 import CameraPreview from './CameraPreview';
 import HistoryBox from './HistoryBox';
+import ChatBox from './ChatBox';
 
 /**
  * CameraPage
@@ -53,7 +54,7 @@ const CameraPage = () => {
 
         {/* === Bottom section: chat box === */}
         <div className="chat">
-          <div>Chat for {cameraId}</div>
+          <ChatBox cameraId={cameraId} />
         </div>
       </Split>
     </div>
