@@ -14,25 +14,26 @@
 - [x] Timeline API → `/timeline` with filters & query params.
 - [x] Static snapshot server → `/snapshots/` serving direct images.
 - [x] Timeline JSON now includes `snapshot_url` for front-end or HA.
-- [x] **Backend refactored to use `App` struct**
-  - Clean separation of DB + config.
-  - All handlers and jobs as `App` methods.
-  - Zero globals → thread-safe, portable, testable.
-- [x] ✅ Retention job: deletes old DB rows AND snapshot files → fully tested!
+- [x] Retention job: deletes old DB rows AND snapshot files → fully tested!
+- [x] **LLM chat pipeline (local Ollama)**
+  - Extracts objects/labels from plain user questions
+  - Looks up last matching detection in SQLite timeline
+  - Returns smart context-aware answer: “I last saw a car at 2 PM”
+  - Fully local, no cloud — fast and free!
+
 ---
 
 ## Up Next
 
-### 🟢 Mini HTML / React Timeline UI
-- Small test dashboard to render timeline grid with thumbnails.
-- Use `/timeline` + `<img src="snapshot_url">`.
-
-### 🔴 LLM Integration
-- Feed logs to Ollama or other local LLM.
-- Daily or weekly summaries: “What did my cameras see the most?”
-
 ### 🔴 Home Assistant Integration
 - Publish smart events: motion/person detected → turn on lights, send notifications.
+
+### 🟢 AI Pipeline Ideas
+- Pass snapshots for richer context
+- Multi-camera queries (“Check all cameras for cars”)
+- Natural-language filters for timeline ranges (“last week”, “past hour”)
+- Stream LLM replies token-by-token for smoother chat UX
+- Experiment with embeddings or RAG to boost factual accuracy
 
 ---
 
@@ -46,3 +47,4 @@ Sandbox to learn:
 - Fast Go backend for REST + static files
 - Clean `App` struct pattern for microservice style
 - Multi-cam smart surveillance
+- LLM-powered edge chat assistant

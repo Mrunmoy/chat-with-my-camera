@@ -1,12 +1,78 @@
-# React + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+This folder contains the **React frontend** for `chat-with-my-camera`. It shows:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Multi-camera **Dashboard** (auto grid layout).
+- **Camera Detail Page** → preview, timeline, and chat.
+- Pastel camera cards with random colors.
+- Calls backend `/cameras`, `/timeline`, and `/chat`.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How to Run
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Runs with Vite by default on port 5173.
+
+---
+
+## Structure
+
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── Dashboard.jsx  # Grid of camera cards
+│   │   ├── CameraCard.jsx # Individual camera box
+│   │   ├── CameraPage.jsx # Layout for single camera view
+│   │   ├── CameraPreview.jsx # Shows latest detection image
+│   │   ├── HistoryBox.jsx # Timeline picker + Chrono timeline
+│   │   ├── ChatBox.jsx    # Chat input & messages
+│   ├── styles/            # All CSS modules
+│   ├── App.jsx            # Main Router
+│   ├── main.jsx           # Entry point
+```
+
+---
+
+## How It Works
+
+- Dashboard fetches `/cameras` → maps to `<CameraCard>` → each card links to `/camera/:cameraId`.
+
+- CameraPage uses **react-split** for resizable sections:
+
+- Preview → `<CameraPreview>`
+- History → `<HistoryBox>`
+- Chat → `<ChatBox>`
+
+- History uses **react-datepicker** for date range and **react-chrono** for event timeline.
+
+- ChatBox sends `{ camera_id, message }` to `/chat` and shows back LLM answer.
+
+---
+
+## Example Flow
+
+- Open Dashboard → see all cameras.
+- Click a card → open CameraPage.
+- Preview shows latest detection or fallback thumbnail.
+- Timeline auto-queries `/timeline?camera_id=...` with date range.
+- Chat sends plain text → backend extracts object → LLM answers with real detection info.
+
+---
+
+## Tech Stack
+
+- React + Vite
+- react-router-dom (routing)
+- react-split-pane (resizable layout)
+- react-datepicker, react-chrono
+- Custom CSS (styles/)
+
