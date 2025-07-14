@@ -194,3 +194,56 @@ func (app *App) camerasHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to write /cameras response: %v", err)
 	}
 }
+
+// handleChat handles POST /chat requests.
+// It receives { camera_id, message } JSON and returns { answer: "..." } JSON.// handleChat handles POST /chat for LLM queries.
+// It returns a fake answer for now, with full CORS handling.
+func (app *App) handleChat(w http.ResponseWriter, r *http.Request) {
+	// === CORS headers ===
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
+
+	// === Handle preflight ===
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	// === Only allow POST ===
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// === Parse request body ===
+	var req struct {
+		CameraID string `json:"camera_id"`
+		Message  string `json:"message"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Invalid request body: %v", err)
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("handleChat: camera_id=%s message=%s", req.CameraID, req.Message)
+
+	// === Fake LLM reply ===
+	fakeAnswer := "Pretend I'm your LLM! You asked: '" +
+		req.Message + "' about camera '" + req.CameraID + "'."
+
+	// === Send response ===
+	resp := map[string]string{
+		"answer": fakeAnswer,
+	}
+
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		log.Printf("Error encoding response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("handleChat: replied with fake answer")
+}
