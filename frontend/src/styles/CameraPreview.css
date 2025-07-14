@@ -27,3 +27,10 @@
 .camera-preview img:hover {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
 }
+
+.last-updated {
+  margin-top: 10px;
+  color: #aaa;
+  font-size: 0.85rem;
+  text-align: center;
+}

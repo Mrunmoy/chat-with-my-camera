@@ -4,13 +4,13 @@ import (
 	// "database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"os"
-	"io"
 )
 
 // timelineHandler handles GET requests to /timeline
@@ -25,7 +25,6 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 	startTimeStr := r.URL.Query().Get("start_time")
 	endTimeStr := r.URL.Query().Get("end_time")
 
-
 	log.Printf("[TimelineHandler] camera_id: %s, label: %s, start_time: %s, end_time: %s\n", cameraID, label, startTimeStr, endTimeStr)
 
 	// === Build WHERE conditions and arguments ===
@@ -39,7 +38,7 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 
 	if label != "" {
 		// The 'labels' column is JSON text, so we use LIKE to match substrings.
-        // Because labels are stored as JSON text (["person"]), so we match substrings with LIKE '%person%'.
+		// Because labels are stored as JSON text (["person"]), so we match substrings with LIKE '%person%'.
 		conditions = append(conditions, "labels LIKE ?")
 		args = append(args, "%"+label+"%")
 	}
@@ -65,9 +64,8 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 	if len(conditions) > 0 {
 		query += " WHERE " + strings.Join(conditions, " AND ")
 	}
-    // So we don’t dump thousands of rows on a single query. Can add ?limit later.
+	// So we don’t dump thousands of rows on a single query. Can add ?limit later.
 	query += " ORDER BY timestamp DESC LIMIT 100" // Limit to 100 results for now
-
 
 	log.Printf("Timeline query: %s\n", query)
 
@@ -93,7 +91,7 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-        // Build safe snapshot URL (strip ./snapshots/)
+		// Build safe snapshot URL (strip ./snapshots/)
 		snapshotURL := ""
 		if snapshotFile != "" {
 			snapshotURL = fmt.Sprintf("/snapshots/%s", filepath.Base(snapshotFile))
@@ -104,8 +102,8 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 			"camera_id":     cid,
 			"labels":        labels,
 			"boxes":         boxes,
-			"snapshot_file": snapshotFile,  // raw path, for debug
-            "snapshot_url":  snapshotURL,   // public URL via static file server
+			"snapshot_file": snapshotFile, // raw path, for debug
+			"snapshot_url":  snapshotURL,  // public URL via static file server
 		})
 	}
 
@@ -113,7 +111,6 @@ func (app *App) handleTimeline(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
 }
-
 
 // handleSnapshot serves snapshot image files from your ./snapshots directory.
 // Example: GET /snapshot?file=garage_webcam_1752205055.jpg
@@ -146,15 +143,47 @@ func handleSnapshot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleLatest returns the latest detection for a camera
+func (app *App) handleLatest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	cameraID := r.URL.Query().Get("camera_id")
+	if cameraID == "" {
+		http.Error(w, "Missing camera_id", http.StatusBadRequest)
+		return
+	}
+
+	row := app.DB.QueryRow(
+		"SELECT timestamp, snapshot_file FROM detections WHERE camera_id = ? ORDER BY timestamp DESC LIMIT 1",
+		cameraID,
+	)
+
+	var timestamp float64
+	var snapshotFile string
+
+	err := row.Scan(&timestamp, &snapshotFile)
+	if err != nil {
+		http.Error(w, "No detections found", http.StatusNotFound)
+		return
+	}
+
+	result := map[string]interface{}{
+		"timestamp":     timestamp,
+		"snapshot_file": snapshotFile,
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
 // camerasHandler returns all cameras from your config.
 func (app *App) camerasHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	
+
 	cameras := []CameraInfo{}
 	for i, cam := range app.Config.Cameras {
 		cameras = append(cameras, CameraInfo{
-			ID:     cam.ID,
-			Number: i + 1, // 1-based serial number
+			ID:        cam.ID,
+			Number:    i + 1,         // 1-based serial number
 			Thumbnail: cam.Thumbnail, // from config.json
 		})
 	}

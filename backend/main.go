@@ -47,6 +47,7 @@ func main() {
 	mux.HandleFunc("/timeline", app.handleTimeline)
 	mux.HandleFunc("/cameras", app.camerasHandler)
 	mux.HandleFunc("/snapshot", handleSnapshot)
+	mux.HandleFunc("/latest", app.handleLatest)
 
 	// Static file servers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))

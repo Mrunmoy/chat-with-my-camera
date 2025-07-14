@@ -31,29 +31,33 @@ const HistoryBox = ({ cameraId }) => {
    * Timestamps must be EPOCH SECONDS (not ISO).
    */
   useEffect(() => {
-    // Convert JS Date objects to epoch seconds
     const startEpoch = Math.floor(startDate.getTime() / 1000);
     const endEpoch = Math.floor(endDate.getTime() / 1000);
 
-    // Build the correct URL with query params
     const url = `http://localhost:8080/timeline?camera_id=${cameraId}&start_time=${startEpoch}&end_time=${endEpoch}`;
 
-    // Call your backend API
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        // ✅ Transform each event for React Chrono format:
-        // title: time, cardTitle: summary, cardSubtitle/cardDetailedText: extra info
         const chronoItems = data.map((event) => ({
-          title: new Date(event.timestamp * 1000).toLocaleString(), // Convert epoch to local time
-          cardTitle: event.type || 'Detection Event',
-          cardSubtitle: event.details || '',
-          cardDetailedText: event.description || '',
+          title: new Date(event.timestamp * 1000).toLocaleString(),
+          cardTitle: event.labels ? JSON.parse(event.labels).join(', ') : 'Detection Event',
+          cardSubtitle: event.camera_id || '',
+          cardDetailedText: '',
+          media: event.snapshot_file
+          ? {
+              name: 'Snapshot',
+              source: {
+                url: `http://localhost:8080/snapshot?file=${event.snapshot_file.split('/').pop()}`
+              },
+              type: 'IMAGE'
+            }
+          : undefined
         }));
         setEvents(chronoItems);
       })
       .catch((err) => console.error('Error fetching timeline:', err));
-  }, [cameraId, startDate, endDate]); // Dependencies: refetch when these change
+  }, [cameraId, startDate, endDate]);
 
   return (
     <div className="history-box">
