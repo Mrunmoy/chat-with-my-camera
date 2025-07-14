@@ -2,6 +2,7 @@ package main
 
 import (
 	// "database/sql"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // timelineHandler handles GET requests to /timeline
@@ -198,52 +200,198 @@ func (app *App) camerasHandler(w http.ResponseWriter, r *http.Request) {
 // handleChat handles POST /chat requests.
 // It receives { camera_id, message } JSON and returns { answer: "..." } JSON.// handleChat handles POST /chat for LLM queries.
 // It returns a fake answer for now, with full CORS handling.
+
+// === Structures for Ollama ===
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type ChatRequest struct {
+	Model    string        `json:"model"`
+	Messages []ChatMessage `json:"messages"`
+}
+
+type ChatChoice struct {
+	Message ChatMessage `json:"message"`
+}
+
+type ChatResponse struct {
+	Choices []ChatChoice `json:"choices"`
+}
+
 func (app *App) handleChat(w http.ResponseWriter, r *http.Request) {
-	// === CORS headers ===
+	// === CORS ===
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
-	// === Handle preflight ===
 	if r.Method == http.MethodOptions {
 		return
 	}
-
-	// === Only allow POST ===
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// === Parse request body ===
+	// === Parse request ===
 	var req struct {
 		CameraID string `json:"camera_id"`
 		Message  string `json:"message"`
 	}
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Printf("Invalid request body: %v", err)
-		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-
 	log.Printf("handleChat: camera_id=%s message=%s", req.CameraID, req.Message)
 
-	// === Fake LLM reply ===
-	fakeAnswer := "Pretend I'm your LLM! You asked: '" +
-		req.Message + "' about camera '" + req.CameraID + "'."
+	// === STEP 1: Extract object(s) ===
+	extractionPrompt := fmt.Sprintf(
+		"User question: %s\n\nExtract the main object(s) or labels the user wants to know about. Return ONLY a JSON array, e.g. [\"car\"] or [\"person\", \"dog\"]. If no object, return [].",
+		req.Message)
 
-	// === Send response ===
-	resp := map[string]string{
-		"answer": fakeAnswer,
+	extractionReq := ChatRequest{
+		Model: "llama3",
+		Messages: []ChatMessage{
+			{Role: "system", Content: "You extract objects only. No explanation."},
+			{Role: "user", Content: extractionPrompt},
+		},
 	}
 
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		log.Printf("Error encoding response: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	bodyBytes, _ := json.Marshal(extractionReq)
+	resp, err := http.Post(
+		"http://localhost:11434/v1/chat/completions",
+		"application/json",
+		bytes.NewBuffer(bodyBytes),
+	)
+	if err != nil {
+		log.Printf("Ollama extract POST failed: %v", err)
+		http.Error(w, "LLM extraction failed", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Ollama extract status %d", resp.StatusCode)
+		http.Error(w, "LLM extraction non-200", http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("handleChat: replied with fake answer")
+	var extractResp ChatResponse
+	if err := json.NewDecoder(resp.Body).Decode(&extractResp); err != nil {
+		log.Printf("Decode extract response failed: %v", err)
+		http.Error(w, "Invalid extract response", http.StatusInternalServerError)
+		return
+	}
+
+	// Parse the extracted JSON array
+	extracted := extractResp.Choices[0].Message.Content
+	log.Printf("handleChat: extracted raw: %s", extracted)
+
+	var objects []string
+	if err := json.Unmarshal([]byte(extracted), &objects); err != nil {
+		log.Printf("JSON unmarshal failed: %v", err)
+		objects = []string{}
+	}
+	log.Printf("handleChat: extracted objects: %v", objects)
+
+	// === STEP 2: Query DB for most recent matching detection ===
+	var contextString string
+
+	if len(objects) > 0 {
+		// Use first extracted object for now
+		object := objects[0]
+		log.Printf("Searching for object: %s", object)
+
+		row := app.DB.QueryRow(`
+			SELECT timestamp, labels FROM detections
+			WHERE camera_id = ? AND labels LIKE ?
+			ORDER BY timestamp DESC LIMIT 1
+		`, req.CameraID, "%"+object+"%")
+
+		var ts float64
+		var labels string
+		err := row.Scan(&ts, &labels)
+		if err == nil {
+			t := time.Unix(int64(ts), 0).Format(time.RFC3339)
+			contextString = fmt.Sprintf("- Last detection: %s Labels: %s\n", t, labels)
+		} else {
+			contextString = fmt.Sprintf("No detections found for '%s'.", object)
+		}
+
+	} else {
+		// No object found → fallback to latest 5
+		rows, err := app.DB.Query(`
+			SELECT timestamp, labels FROM detections
+			WHERE camera_id = ?
+			ORDER BY timestamp DESC LIMIT 5
+		`, req.CameraID)
+		if err != nil {
+			log.Printf("Fallback DB query failed: %v", err)
+			contextString = "No detection history available."
+		} else {
+			defer rows.Close()
+			for rows.Next() {
+				var ts float64
+				var labels string
+				rows.Scan(&ts, &labels)
+				t := time.Unix(int64(ts), 0).Format(time.RFC3339)
+				contextString += fmt.Sprintf("- Time: %s Labels: %s\n", t, labels)
+			}
+			if contextString == "" {
+				contextString = "No recent detections found."
+			}
+		}
+	}
+
+	// === STEP 3: Final prompt ===
+	finalPrompt := fmt.Sprintf(
+		"Camera: %s\n\nDetection context:\n%s\n\nUser question: %s",
+		req.CameraID, contextString, req.Message)
+
+	log.Printf("handleChat: final prompt:\n%s", finalPrompt)
+
+	// === STEP 4: Send final prompt to Ollama ===
+	finalReq := ChatRequest{
+		Model: "llama3",
+		Messages: []ChatMessage{
+			{Role: "system", Content: "You are a helpful camera assistant."},
+			{Role: "user", Content: finalPrompt},
+		},
+	}
+
+	bodyBytes, _ = json.Marshal(finalReq)
+	resp2, err := http.Post(
+		"http://localhost:11434/v1/chat/completions",
+		"application/json",
+		bytes.NewBuffer(bodyBytes),
+	)
+	if err != nil {
+		log.Printf("Ollama final POST failed: %v", err)
+		http.Error(w, "LLM final call failed", http.StatusInternalServerError)
+		return
+	}
+	defer resp2.Body.Close()
+
+	if resp2.StatusCode != http.StatusOK {
+		log.Printf("Ollama final returned status %d", resp2.StatusCode)
+		http.Error(w, "LLM final non-200", http.StatusInternalServerError)
+		return
+	}
+
+	var finalResp ChatResponse
+	if err := json.NewDecoder(resp2.Body).Decode(&finalResp); err != nil {
+		log.Printf("Decode final response failed: %v", err)
+		http.Error(w, "Invalid final response", http.StatusInternalServerError)
+		return
+	}
+
+	answer := finalResp.Choices[0].Message.Content
+	log.Printf("handleChat: final answer: %s", answer)
+
+	// === Return to frontend ===
+	json.NewEncoder(w).Encode(map[string]string{
+		"answer": answer,
+	})
 }
