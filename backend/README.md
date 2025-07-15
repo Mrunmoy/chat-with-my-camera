@@ -1,5 +1,7 @@
 # Backend
 
+![Go](https://img.shields.io/badge/Go-1.21-blue?logo=go&logoColor=white)
+
 ## Overview
 
 This folder contains the **Go backend** for `chat-with-my-camera`.

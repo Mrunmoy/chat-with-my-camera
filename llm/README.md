@@ -1,5 +1,8 @@
 # LLM
 
+
+![LLM](https://img.shields.io/badge/LLM-Ollama-orange?logo=OpenAI&logoColor=white)
+
 ## Overview
 
 This folder documents the **Local LLM integration** for `chat-with-my-camera`.

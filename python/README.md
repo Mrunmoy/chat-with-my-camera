@@ -1,5 +1,7 @@
 # MQ Pub Sub & Camera Handling
 
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
+
 ## Overview
 
 This folder covers the **Python parts** for `chat-with-my-camera`:

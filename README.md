@@ -1,10 +1,26 @@
 # 📸 Chat with camera
 
+![Status](https://img.shields.io/badge/Status-MVP-brightgreen)
+
+![Go](https://img.shields.io/badge/Go-1.21-blue?logo=go&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![LLM](https://img.shields.io/badge/LLM-Ollama-orange?logo=openai&logoColor=white)
+![ZeroMQ](https://img.shields.io/badge/ZeroMQ-Pub--Sub-red?logo=zeromq&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-3-lightgrey?logo=sqlite&logoColor=white)
+
+![License](https://img.shields.io/badge/License-MIT-green)
+
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Raspberry%20Pi-lightgrey?logo=raspberrypi)
+
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+
 
 **A modular, real-time object detection system for your local network - with YOLOv8, ZeroMQ pub/sub, timeline storage, and a local LLM that lets you *****talk***** to your cameras.** 
-It is in no way perfect and is basically a sandbox for experimenting with different technologies and programming languages and see how we can integrate them together to make something so much fun!
 
-I had a webcam lying around and a few Unifi flex cameras, so I just used them to see if I can make something that can do smart detections and integrate with LLM to answer some questions. Well to my pleasant surprise, working on this project was way more fun than I expected it to be. I was super scared but at least made it to this point here. Hope you have fun.
+It is in no way perfect and is basically a sandbox for experimenting with different technologies and programming languages and see how we can integrate them together to make something so much fun! Specially using [**ChatGPT**](https://chat.openai.com/) as a helper to get code syntax and a team mate to discuss debugging certain areas in the backend and frontend which i was not familiar with, was awesome!
+
+I had a [Logitech c270 webcam](https://www.logitech.com/en-au/shop/p/c270-hd-webcam) lying around and a few [Unifi flex](https://techspecs.ui.com/unifi/cameras-nvrs/uvc-g3-flex?subcategory=all-cameras-nvrs) cameras, so I just used them to see if I can make something that can do smart detections and integrate with LLM to answer some questions. Well to my pleasant surprise, working on this project was way more fun than I expected it to be. I was super scared but at least made it to this point here. Hope you have fun.
 
 - Fully local — no cloud fees
 - Modular pub/sub -> easy to swap parts

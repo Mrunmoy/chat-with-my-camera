@@ -1,5 +1,7 @@
 # Frontend
 
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+
 ## Overview
 
 This folder contains the **React frontend** for `chat-with-my-camera`. It shows:
