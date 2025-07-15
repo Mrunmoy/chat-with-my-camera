@@ -1,6 +1,6 @@
-# 💡 Chat with my camera — Ideas Parking Lot
+# Ideas Parking Lot
 
-### ✅ What’s working now
+### What’s working now
 - [x] Local webcam source → tested!
 - [x] RTSP camera source → tested with Unifi Protect!
 - [x] YOLOv8 detection loop → tested!
@@ -25,10 +25,10 @@
 
 ## Up Next
 
-### 🔴 Home Assistant Integration
+### Home Assistant Integration
 - Publish smart events: motion/person detected → turn on lights, send notifications.
 
-### 🟢 AI Pipeline Ideas
+### AI Pipeline Ideas
 - Pass snapshots for richer context
 - Multi-camera queries (“Check all cameras for cars”)
 - Natural-language filters for timeline ranges (“last week”, “past hour”)
