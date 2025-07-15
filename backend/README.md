@@ -25,7 +25,8 @@ This folder contains the **Go backend** for `chat-with-my-camera`.
 
 ```bash
 cd backend
-go run main.go
+go  build
+./backend
 ```
 
 Default port: **8080**. Snapshot images must be accessible under `./snapshots` relative to the backend.
