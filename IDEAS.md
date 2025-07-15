@@ -1,51 +1,50 @@
 # 💡 Chat with my camera — Ideas Parking Lot
 
-### Whats working Now
+### ✅ What’s working now
 - [x] Local webcam source → tested!
 - [x] RTSP camera source → tested with Unifi Protect!
 - [x] YOLOv8 detection loop → tested!
 - [x] ZeroMQ publisher for detection events → working!
-- [x] Config loader (YAML) → flexible switching between webcam and RTSP.
+- [x] Config loader (YAML) → flexible webcam/RTSP.
 - [x] Multi-camera support → multiple streams, single grid view.
-- [x] Dynamic grid layout → auto 1x1, 2x2, 3x3, 4x4... resizes feeds to same size.
+- [x] Dynamic grid layout → auto 1x1, 2x2, 3x3, 4x4.
+- [x] Robust reconnect logic for webcam & RTSP.
+- [x] Per-camera deduplication (labels only) & throttling.
+- [x] Offline placeholder overlay → tested with real unplug/reboot.
+- [x] Timeline API → `/timeline` with filters & query params.
+- [x] Static snapshot server → `/snapshots/` serving direct images.
+- [x] Timeline JSON now includes `snapshot_url` for front-end or HA.
+- [x] Retention job: deletes old DB rows AND snapshot files → fully tested!
+- [x] **LLM chat pipeline (local Ollama)**
+  - Extracts objects/labels from plain user questions
+  - Looks up last matching detection in SQLite timeline
+  - Returns smart context-aware answer: “I last saw a car at 2 PM”
+  - Fully local, no cloud — fast and free!
+
+---
 
 ## Up Next
 
-### 🟢 1. **RTSP Source Support**
-- Add `camera/rtsp.py` to handle IP cameras or streams.
-- Swap between `Webcam` and `RTSPCamera` via config.
+### 🔴 Home Assistant Integration
+- Publish smart events: motion/person detected → turn on lights, send notifications.
 
-### 🟢 2. **Config Loader**
-- Add a YAML or JSON config file:
-  - Camera source: webcam / RTSP
-  - YOLO model path: yolov8n.pt, yolov8s.pt, etc.
-  - Publisher port
-  - Throttling level
-- Load this in `main.py` so the pipeline is fully flexible.
+### 🟢 AI Pipeline Ideas
+- Pass snapshots for richer context
+- Multi-camera queries (“Check all cameras for cars”)
+- Natural-language filters for timeline ranges (“last week”, “past hour”)
+- Stream LLM replies token-by-token for smoother chat UX
+- Experiment with embeddings or RAG to boost factual accuracy
 
-### 🔴 3. **Logging**
-- Add a simple file logger subscriber:
-  - Save events to JSONL or SQLite.
-  - Optionally store snapshot images with filenames.
-
-### 🔴 4. **LLM Integration**
-- Add local Ollama or other local LLM.
-- Feed detection logs to LLM to generate daily summaries:
-  - “What did the camera see most often?”
-  - “When did a person appear?”
-
-### 🔴 5. **HA Integration**
-- Integrate with Home Asistant and pubnlish events
 ---
-
 
 ## Big Picture
 
-This project is my sandbox to learn:
- - Real-time computer vision 
- - Interface-driven pub/sub  
- - Edge-device AI  
- - Config-driven design  
- - Multi-cam surveillance 🐱✨
-
----
+Sandbox to learn:
+- Real-time computer vision + OpenCV
+- YOLOv8 edge detection
+- ZeroMQ pub/sub for decoupled pipelines
+- SQLite event store with retention & disk cleanup
+- Fast Go backend for REST + static files
+- Clean `App` struct pattern for microservice style
+- Multi-cam smart surveillance
+- LLM-powered edge chat assistant

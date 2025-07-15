@@ -1,0 +1,90 @@
+/* === Camera Page Container === */
+.camera-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+}
+
+/* === Header Banner === */
+.camera-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center the children horizontally by default */
+  padding: 10px 20px;
+  background-color: #222;
+  /* border-bottom: 1px solid #444; */
+  position: relative; /* For absolute positioning if needed */
+}
+
+/* Back button styles */
+.camera-header .back-button {
+  position: absolute;   /* Fix it to the left side */
+  left: 20px;
+  background-color: #444;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.camera-header .back-button:hover {
+  background-color: #666;
+}
+
+/* Camera name text */
+.camera-header .camera-name {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+/* === Split Pane Layout === */
+.camera-layout {
+  flex: 1; /* This fills remaining space below header */
+  height: 100%; /* Extra insurance for react-split */
+}
+
+/* Gutter between main/chat sections */
+.gutter.gutter-vertical {
+  background-color: #444;
+  cursor: row-resize; /* Show resize cursor immediately */
+}
+
+/* === Top area: preview + history side by side === */
+.main-content {
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Preview pane on the left */
+.main-content .preview {
+  background-color: #111;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* History pane on the right */
+.main-content .history {
+  background-color: #222;
+  padding: 20px;
+  overflow: auto;
+}
+
+.preview,
+.history {
+  height: 100%;
+  overflow: auto;
+}
+
+/* === Bottom chat box === */
+.chat {
+  flex-shrink: 0;
+  min-height: 150px;
+  max-height: 300px;  /* Or adjust for your needs */
+  background-color: #333;
+  padding: 20px;
+  overflow: auto;
+}

@@ -1,15 +1,19 @@
+retention_days: 5
+
 cameras:
   - id: garage_webcam
     type: webcam  # 'webcam' or 'rtsp'
     index: 0
+    thumbnail: "webcam.png"
 
   - id: lounge_rtsp
     type: rtsp
+    thumbnail: "rtspcam.png"
     url: "rtsps://192.168.10.176:7441/pam607F6TjwKqzzS?enableSrtp"
 
 publisher:
   port: 5555
 
 subscriber:
-  throttle_n: 0   # 0 = no throttle
+  throttle_n: 10   # 0 = no throttle
   deduplicate: true

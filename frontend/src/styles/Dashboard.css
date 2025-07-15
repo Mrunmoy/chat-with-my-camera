@@ -1,0 +1,17 @@
+/* === Dashboard Grid Container === */
+.dashboard {
+  display: grid;
+
+  /* Responsive columns */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+  /* Space between items */
+  gap: 20px;
+
+  /* Add side padding to prevent edge sticking */
+  padding: 20px;
+
+  /* Center the whole grid and limit super-wide screens */
+  max-width: 1200px;  /* tweak as needed */
+  margin: 0 auto;     /* center horizontally */
+}

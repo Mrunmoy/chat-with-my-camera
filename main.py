@@ -2,10 +2,10 @@
 Main entry point for chat-with-my-camera.
 
 This script:
-- Captures frames from the webcam
+- Captures frames from webcams/RTSP
 - Runs YOLOv8 object detection
 - Publishes detection results to ZeroMQ
-- Displays annotated frames in a window
+- Displays annotated frames in a multiview grid
 """
 
 from camera.webcam import Webcam
@@ -20,6 +20,7 @@ import cv2
 import math
 import time
 import base64
+
 
 def make_multi_view_grid(frames, cell_size=(640, 480)):
     """
@@ -85,6 +86,18 @@ def main():
         frames = []
         for cam in cameras:
             frame = cam.get_frame()
+
+            if frame is None:
+                # Camera offline, show placeholder
+                frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                cv2.putText(frame, f"Camera Offline: {cam.id}",
+                            (50, 240),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1, (0, 0, 255), 2)
+                frames.append(frame)
+                continue  # Skip detection & publishing for offline feed
+
+            # If we have a valid frame, run detection
             results = detector.process(frame)
 
             annotated_frame = frame.copy()
@@ -104,20 +117,13 @@ def main():
                     "camera_id": cam.id,
                     "boxes": boxes,
                     "labels": labels,
-                    # "snapshot": jpg_as_text
+                    "snapshot": jpg_as_text
                 }
 
                 # Publish detection event to ZeroMQ
                 publisher.publish(event)
 
-                # Draw boxes and labels on the frame for display
-                annotated_frame = result.plot()
-            
             frames.append(annotated_frame)
-
-            # Show each on a separate window
-            # window_name = f"Feed - {cam.id}"
-            # cv2.imshow(window_name, annotated_frame)
 
         # Show multiview
         multi_view = make_multi_view_grid(frames, cell_size=(640, 480))
@@ -133,6 +139,6 @@ def main():
         cam.release()
     cv2.destroyAllWindows()
 
+
 if __name__ == "__main__":
     main()
-
